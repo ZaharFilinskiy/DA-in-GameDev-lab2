@@ -64,8 +64,11 @@ while i <= len(mon):
         sh.sheet1.update(('C' + str(i)), str(tempInf))
         print(tempInf)
 ```
-Настройка PyCharm заняла много времени но всё же оказалась успешна:
+-Настройка PyCharm заняла много времени но всё же оказалась успешна:
 ![2022-10-08_15-40-32](https://user-images.githubusercontent.com/114186148/194709135-d7a2a1bf-519f-4f86-8a07-4e8f823d65af.png)
+
+-Результаты в google sheets:
+![2022-10-08_15-40-40](https://user-images.githubusercontent.com/114186148/194709344-b3367585-7e11-4480-8ca6-900af55327d7.png)
 
 -Код проекта на Unity получающий данные из google sheets и воспроизводящий аудио файл в зависимости от значения данных из табилицы:
 ```py
