@@ -35,23 +35,134 @@
 - ✨Magic ✨
 
 ## Цель работы
-Ознакомиться с основными операторами зыка Python на примере реализации линейной регрессии.
+Познакомиться с програмными средствами для организации передачи данных между инструментами google, Python и Unity.
 
 ## Задание 1
-### Написать программы Helo World на Python и Unity
+### Реализовать совместную работу и передачу данных в связке Python - Google-Sheets – Unity. При выполнении задания используйте видео-материалы и исходные данные, предоставленные преподавателя курса.
 Ход работы:
-- Для работы на Python я выбрал компьютерную версию-Anacondaz. Установаил, разобрался и написал первую программу вывода сообщения Hello World. С Unity всё оказалось сложнее. Проделав все необходимые шаги для установки программы, я написал вывод сообщения на Vs code, связал его с main camera в unity и в итоге достиг своей цели.
+В начале я с помощью подробного видеоурока, облачном сервисе google console, подключил API для работы с google sheets и google drive. Также скачал PyCharm и начал работу.
 
-- 1)Ссылка на скриншоты Python: Выполнение программы - https://github.com/ZaharFilinskiy/DA-in-GameDev-lab1/blob/15f1f56a2042f20330b8e64a7afbfa94793ad7ec/2022-09-24_16-39-16.png , Сохранение программы https://github.com/ZaharFilinskiy/DA-in-GameDev-lab1/blob/15f1f56a2042f20330b8e64a7afbfa94793ad7ec/2%20%D0%BA%D0%B0%D1%80%D1%82%D0%B8%D0%BD%D0%BA%D0%B0.png
-- 2)Ссылки на скриншоты Unity : Выполнение программы в консоли - https://github.com/ZaharFilinskiy/DA-in-GameDev-lab1/blob/15f1f56a2042f20330b8e64a7afbfa94793ad7ec/unityy.png ; Текст на VS code - https://github.com/ZaharFilinskiy/DA-in-GameDev-lab1/blob/15f1f56a2042f20330b8e64a7afbfa94793ad7ec/%D1%82%D0%B5%D0%BA%D1%81%D1%82%20%D1%84%D0%B0%D0%B9%D0%BB%D0%B0.png
+-Код Реализации записи в google sheets:
+```py
+import gspread
+import numpy as np
+gc = gspread.service_account(filename='unitydatascince-aee913d55043.json')
+sh = gc.open("UnitySheets")
+price = np.random.randint(2000, 10000, 11)
+mon = list(range(1,11))
+i = 0
+while i <= len(mon):
+    i += 1
+    if i == 0:
+        continue
+    else:
+        tempInf = ((price[i-1]-price[i-2])/price[i-2])*100
+        tempInf = str(tempInf)
+        tempInf = tempInf.replace('.',',')
+        sh.sheet1.update(('A'+ str(i)),str(i))
+        sh.sheet1.update(('B' + str(i)), str(price[i-1]))
+        sh.sheet1.update(('C' + str(i)), str(tempInf))
+        print(tempInf)
+```
+Настройка PyCharm заняла много времени но всё же оказалась успешна:
+![2022-10-08_15-40-32](https://user-images.githubusercontent.com/114186148/194709135-d7a2a1bf-519f-4f86-8a07-4e8f823d65af.png)
 
-- Я не очень разобрался нужно ли прикладывать скрины только из репозитория своего, так-что продублировал со скринами с яндекс диска:
+-Код проекта на Unity получающий данные из google sheets и воспроизводящий аудио файл в зависимости от значения данных из табилицы:
+```py
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Networking;
+using SimpleJSON;
 
-- 1)Ссылка на скриншоты Python: Выполнение программы - https://disk.yandex.ru/i/kjYmbIqHo41waQ , Сохранение программы https://disk.yandex.ru/i/ezamsw0aUKc-pA
-- 2)Ссылки на скриншоты Unity : Выполнение программы в консоли - https://disk.yandex.ru/i/Sba-vdSdGxjV4w ; Текст на VS code - https://disk.yandex.ru/i/mMjhkEk7OpKsDQ
+public class NewBehaviourScript : MonoBehaviour
+{
+    public AudioClip goodSpeak;
+    public AudioClip normalSpeak;
+    public AudioClip badSpeak;
+    private AudioSource selectAudio;
+    private Dictionary<string, float> dataSet = new Dictionary<string, float>();
+    private bool statusStart = false;
+    private int i =1;
+    // Start is called before the first frame update
+    void Start()
+    {
+        StartCoroutine(GoogleSheets());
+        
+    }
 
+    // Update is called once per frame
+    void Update()
+    {
+        if (dataSet["Mon_"+ i.ToString()]<=10 & statusStart == false & i != dataSet.Count)
+        {
+            StartCoroutine(PlaySelectAudioGood());
+            Debug.Log(dataSet["Mon_" + i.ToString()]);
+        }
+
+         if (dataSet["Mon_"+ i.ToString()]>10 & dataSet["Mon_"+ i.ToString()]<100 & statusStart == false & i != dataSet.Count)
+         {
+            StartCoroutine(PlaySelectAudioNormal());
+            Debug.Log(dataSet["Mon_" + i.ToString()]);
+         }
+
+         if (dataSet["Mon_"+ i.ToString()]>=100 & statusStart == false & i != dataSet.Count)
+        {StartCoroutine(PlaySelectAudioBad());
+            Debug.Log(dataSet["Mon_" + i.ToString()]);
+        }
+
+    }
+    IEnumerator GoogleSheets()
+    {
+        UnityWebRequest curentResp = UnityWebRequest.Get("https://sheets.googleapis.com/v4/spreadsheets/1fJITSyqBYrDygVX__jPD5FwKagdtWfSvwYWLjGdwpYE/values/Лист1?key=AIzaSyA8Vrl69AiJRjZTDXvnyhaDaJSZ88aF3Ns");
+        yield return curentResp.SendWebRequest();
+        string rawResp = curentResp.downloadHandler.text;
+        var rawJson = JSON.Parse(rawResp);
+        foreach (var itemRawJson in rawJson["values"])
+        {
+            var parseJson = JSON.Parse(itemRawJson.ToString());
+            var selectRow = parseJson[0].AsStringList;
+            dataSet.Add(("Mon_"+selectRow[0]),float.Parse(selectRow[2]));
+
+        }
+        
+    }
+    IEnumerator PlaySelectAudioGood()
+    {
+        statusStart = true;
+        selectAudio = GetComponent<AudioSource>();
+        selectAudio.clip = goodSpeak;
+        selectAudio.Play();
+        yield return new WaitForSeconds(3);
+        statusStart = false;
+        i++;
+    }
+
+     IEnumerator PlaySelectAudioNormal()
+    {
+        statusStart = true;
+        selectAudio = GetComponent<AudioSource>();
+        selectAudio.clip = normalSpeak;
+        selectAudio.Play();
+        yield return new WaitForSeconds(3);
+        statusStart = false;
+        i++;
+    }
+
+     IEnumerator PlaySelectAudioBad()
+    {
+        statusStart = true;
+        selectAudio = GetComponent<AudioSource>();
+        selectAudio.clip = badSpeak;
+        selectAudio.Play();
+        yield return new WaitForSeconds(4);
+        statusStart = false;
+        i++;
+    }
+}
+```
 ## Задание 2
-### В разделе "ход работы" пошагово выполнить каждый пункт с описанием и примером реализации задачи по теме лабораторной работы.
+### Реализовать запись в Google-таблицу набора данных, полученных с помощью линейной регрессии из лабораторной работы № 1.
 
 - Выполнив каждый пункт второго задания лабораторной работы я увидел примеры линейной регресси, изучил новые функции и их применение в языке Python.
 
@@ -119,7 +230,7 @@ plt. plot (x, prediction)
 - Выполнение программы: https://github.com/ZaharFilinskiy/DA-in-GameDev-lab1/blob/d9aacfc8ff07303e40f13ff4a308f9f30ed8d186/2022-09-26_18-49-14.png
 
 ## Задание 3
-### Должна ли величина loss стремиться к нулю при изменении исходных данных? Ответьте на вопрос, приведите пример выполнения кода, который подтверждает ваш ответ.Какова роль параметра Lr? Ответьте на вопрос, приведите пример выполнения кода, который подтверждает ваш ответ. В качестве эксперимента можете изменить значение параметра.
+### Самостоятельно разработать сценарий воспроизведения звукового сопровождения в Unity в зависимости от изменения считанных данных в задании 2.
 
 -Опытным путём я установил что ведечина loss не должна стремиться к нулю при изменении исходных данных. Если loss будет стремиться к нулю то график будет паралельным оси x или же острым углом к этой же оси. 
 
