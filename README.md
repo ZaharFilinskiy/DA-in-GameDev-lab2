@@ -164,6 +164,13 @@ public class NewBehaviourScript : MonoBehaviour
     }
 }
 ```
+Результаты Unity:
+![2022-10-08_18-14-57](https://user-images.githubusercontent.com/114186148/194709497-64704880-294d-49df-946a-1da67dfa2042.png)
+
+Совместно с Гугл Таблицей:
+![2022-10-08_18-15-17](https://user-images.githubusercontent.com/114186148/194709609-1b041d2a-9dc9-468e-a6d8-5358d042004e.png)
+
+
 ## Задание 2
 ### Реализовать запись в Google-таблицу набора данных, полученных с помощью линейной регрессии из лабораторной работы № 1.
 
