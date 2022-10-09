@@ -1,5 +1,5 @@
 # АНАЛИЗ ДАННЫХ И ИСКУССТВЕННЫЙ ИНТЕЛЛЕКТ [in GameDev]
-Отчет по лабораторной работе #1 выполнил(а):
+Отчет по лабораторной работе #2 выполнил(а):
 - Филинский Захар Евгеньевич
 - РИ211121
 Отметка о выполнении заданий (заполняется студентом):
@@ -8,7 +8,7 @@
 | ------ | ------ | ------ |
 | Задание 1 | * | 60 |
 | Задание 2 | * | 20 |
-| Задание 3 | * | 20 |
+| Задание 3 | # | 20 |
 
 знак "*" - задание выполнено; знак "#" - задание не выполнено;
 
@@ -40,9 +40,9 @@
 ## Задание 1
 ### Реализовать совместную работу и передачу данных в связке Python - Google-Sheets – Unity. При выполнении задания используйте видео-материалы и исходные данные, предоставленные преподавателя курса.
 Ход работы:
-В начале я с помощью подробного видеоурока, облачном сервисе google console, подключил API для работы с google sheets и google drive. Также скачал PyCharm и начал работу.
+В начале я с помощью подробного видеоурока в облачном сервисе google console подключил API для работы с google sheets и google drive. Также скачал PyCharm и начал работу.
 
--Код Реализации записи в google sheets:
+-Код Реализации записи в google sheets на PyCharm:
 ```py
 import gspread
 import numpy as np
@@ -70,7 +70,10 @@ while i <= len(mon):
 -Результаты в google sheets:
 ![2022-10-08_15-40-40](https://user-images.githubusercontent.com/114186148/194709344-b3367585-7e11-4480-8ca6-900af55327d7.png)
 
+Далее глянул видеоуроки на unity, ознакомился с "материалами для лабораторной работы" и приступил к работе.
+
 -Код проекта на Unity получающий данные из google sheets и воспроизводящий аудио файл в зависимости от значения данных из табилицы:
+
 ```py
 using System.Collections;
 using System.Collections.Generic;
@@ -174,115 +177,40 @@ public class NewBehaviourScript : MonoBehaviour
 ## Задание 2
 ### Реализовать запись в Google-таблицу набора данных, полученных с помощью линейной регрессии из лабораторной работы № 1.
 
-- Выполнив каждый пункт второго задания лабораторной работы я увидел примеры линейной регресси, изучил новые функции и их применение в языке Python.
+В данном задании я не совсем понял какие именно данные нужно было занести в гугл таблицу и взял данные координат точек по x и y, крайней лабораторной работы, посчитав ,что в любом случае это тоже практика. Немного деформировал код из предыдущего задания и достиг результата. 
+Также разобрался с кодом и системой записи данных в google sheets.
 
 ```py
+import gspread
 import numpy as np
-import matplotlib.pyplot as plt
-%matplotlib inline
-x=[3, 21, 22, 34, 54, 34, 55, 67, 88, 99]
-x=np.array(x)
-y=[2, 22, 24, 65, 79, 82, 55, 130, 150, 199]
-y=np.array(y)
-plt.scatter(x,y)
+gc = gspread.service_account(filename='unitydatascince-aee913d55043.json')
+sh = gc.open("UnitySheets")
+mon = list(range(1,11))
+
+x=[0, 21, 22, 29, 54, 34, 55, 67, 88, 99, 100]
+y=[1, 22, 24, 70, 79, 82, 55, 140, 150, 200, 300]
+i = 0
+while i <= len(mon):
+    i += 1
+    if i == 0:
+        continue
+    else:
+
+        sh.sheet1.update(('A'+ str(i)),str(i))
+        sh.sheet1.update(('B' + str(i)), str(x[i-1]))
+        sh.sheet1.update(('C' + str(i)), str(y[i-1]))
 ```
-- Выполнение программы: https://github.com/ZaharFilinskiy/DA-in-GameDev-lab1/blob/d9aacfc8ff07303e40f13ff4a308f9f30ed8d186/2022-09-26_18-41-47.png
+-Результат в таблице: 
 
-```py
-def model (a, b, x):
-    return a*x + b
-
-
-def loss_function(a, b, x, y):
-    num = len(x)
-    prediction = model (a,b,x)
-    return (0.5/num) * (np.square(prediction-y)).sum()
-
-def optimize(a,b,x,y):
-    num=len(x)
-    prediction = model(a,b,x)
-    da = (1.0/num) * ( (prediction -y)*x).sum()
-    db = (1.0/num) * ((prediction -y).sum())
-    a = a - Lr*da
-    b = b = Lr*db
-    return a, b
-
-def iterate(a, b, x, y, times) :
-    for i in range(times):
-        a,b = optimize(a,b,x,y)
-    return a, b
-```
-
-```py
-a = np.random.rand (1)
-print(a)
-b = np.random.rand(1)
-print (b)
-Lr = 0.000001
-
-a,b = iterate(a,b,x,y,1)
-prediction=model (a, b, x)
-loss = loss_function(a, b, x, y)
-print (a, b, loss)
-plt.scatter(x, y)
-plt.plot(x,prediction)
-```
-- Выполнение программы: https://github.com/ZaharFilinskiy/DA-in-GameDev-lab1/blob/d9aacfc8ff07303e40f13ff4a308f9f30ed8d186/2022-09-26_18-48-06.png
-
-```py
-a,b = iterate(a,b,x,y,1000)
-prediction=model (a,b,x)
-loss = loss_function(a, b, x, y)
-print (a, b, loss)
-plt.scatter(x,y)
-plt. plot (x, prediction)
-```
-- Выполнение программы: https://github.com/ZaharFilinskiy/DA-in-GameDev-lab1/blob/d9aacfc8ff07303e40f13ff4a308f9f30ed8d186/2022-09-26_18-49-14.png
+![2022-10-09_23-47-01](https://user-images.githubusercontent.com/114186148/194774257-c0c547ef-6d5c-4418-8c6c-dce99ccefa38.png)
 
 ## Задание 3
 ### Самостоятельно разработать сценарий воспроизведения звукового сопровождения в Unity в зависимости от изменения считанных данных в задании 2.
 
--Опытным путём я установил что ведечина loss не должна стремиться к нулю при изменении исходных данных. Если loss будет стремиться к нулю то график будет паралельным оси x или же острым углом к этой же оси. 
-
-```py
-a = np.random.rand (1)
-print(a)
-b = np.random.rand(1)
-print (b)
-Lr = 0.000001
-
-a,b = iterate(a,b,x,y,1)
-prediction=model (a, b, x)
-loss = 0
-print (a, b, loss)
-plt.scatter(x, y)
-plt.plot(x,prediction)
-
-```
-Итог : https://github.com/ZaharFilinskiy/DA-in-GameDev-lab1/blob/ea2c933e63cf9cbc5a1718a1495bfee4f18708dc/2022-09-26_19-29-03.png
-
--Параметр Lr помогает правильно выстравить кривую и соотвествущие ей оси x и y. Выступает в роли некого коэффициента, домножая на который система координат xy выстраивается в нужное положение.
-
-```py
-a = np.random.rand (1)
-print(a)
-b = np.random.rand(1)
-print (b)
-Lr = 0.01
-
-a,b = iterate(a,b,x,y,1)
-prediction=model (a, b, x)
-loss = loss_function(a, b, x, y)
-print (a, b, loss)
-plt.scatter(x, y)
-plt.plot(x,prediction)
-```
-
--Пример что будет если изменить коэффициент: https://github.com/ZaharFilinskiy/DA-in-GameDev-lab1/blob/fabc8f2eba84418b48e07a94a3c5d635a6ba6724/2022-09-26_19-40-57.png
 
 ## Выводы
 
-В ходе выполнения данной лабораторной работы я разобрался с установкой необходимого ПО и также смог настроить его. Написал свою первую программу на unity, anacondaz и поближе познакомился с интерфейсом и функционалом программ. Помимо этого, глубже изучил понятие линейной регрессии на языке python.
+В процессе выполнения лабораторной работы, мной были интегрированы между собой инструменты unity, google и python благодаря чему я научился передавать данные между ними, глубже погрузился в мир игровой валюты благодаря новым знаниям, решил лабораторные задания, тем самым закрепив новые умения.
 
 ## Powered by
 
